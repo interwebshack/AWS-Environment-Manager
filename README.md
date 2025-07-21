@@ -35,7 +35,7 @@ This project provides a secure and automated way to **manage isolated AWS enviro
 ## ✅ Setup
 
 ### **Step 1: Install and Configure AWS CLI**
-Install **AWS CLI v2** and configure credentials:
+Install **AWS CLI v2** and configure credentials:  
 For a full installation guide, see [AWS CLI Installation Guide](docs/aws-cli-installation.md).
 
 >AWS CLI v2 comes with its own Python, so you don’t need to install Python separately. (If you’re installing v1, Python is required.)
