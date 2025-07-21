@@ -1,0 +1,26 @@
+@startuml
+title AWS Environment Management Architecture
+
+actor Admin
+actor IAMUser
+
+rectangle "AWS Account" {
+  rectangle "IAM Components" {
+    [EnvPolicy]
+    [EnvPermissionBoundary]
+  }
+
+  rectangle "Tagged Resources" {
+    [VPC]
+    [EC2 Instances]
+    [Subnets]
+    [Security Groups]
+  }
+}
+
+Admin --> [EnvPolicy] : Create Policy
+Admin --> [EnvPermissionBoundary] : Create Boundary
+Admin --> IAMUser : Attach Policy + Boundary
+IAMUser --> [EC2 Instances] : Launch Tagged Instances
+IAMUser --> [Security Groups] : Create Tagged SGs
+@enduml

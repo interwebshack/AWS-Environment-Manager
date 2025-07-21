@@ -1,0 +1,32 @@
+@startuml
+start
+:mode = create?;
+if (mode == create) then (yes)
+  :Create IAM User;
+  :Create Permission Boundary;
+  :Attach Policy;
+  stop
+endif
+
+if (mode == check) then (yes)
+  :Query Resources with Tag;
+  :Print Resource List;
+  stop
+endif
+
+if (mode == destroy) then (yes)
+  if (nuke == true) then (yes)
+    :Delete EC2 Instances;
+    :Delete ELBs;
+    :Delete NAT GW;
+    :Delete IGWs;
+    :Delete Route Tables;
+    :Delete Subnets;
+    :Delete VPC;
+  endif
+  :Remove IAM User;
+  :Remove IAM Policies;
+  stop
+endif
+stop
+@enduml
