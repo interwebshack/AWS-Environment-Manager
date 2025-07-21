@@ -67,11 +67,29 @@ After installation, configure your credentials:
 ```shell
 aws configure
 ```
-You will need:
+You will be prompted for the following:
 * **AWS Access Key ID**
+  * Where to get it: From the **AWS Management Console** under
+    `IAM → Users → [Your User] → Security Credentials`.
+    Click **Create access key** if you don't already have one.
+    *(Requires IAM permissions to create keys.)*
 * **AWS Secret Access Key**
+    * Where to get it: Displayed only once when you create an access key in IAM.
+      Save it securely (e.g., in a password manager). If lost, you must create a new key.
 * **Default region name** (e.g., `us-east-1`)
+  * Where to get it: Choose an AWS region based on where your resources are hosted.
+    Common regions:
+    * `us-east-1` → N. Virginia
+    * `us-west-2` → Oregon
+    * `eu-west-1` → Ireland
+       Full list: [AWS Regions](https://docs.aws.amazon.com/general/latest/gr/rande.html)  
 * **Output format** (e.g., `json`)
+  * Options:
+    * `json` → Recommended (default)
+    * `table` → Human-readable table
+    * `text` → Plain text
+  * You can change it later by editing `~/.aws/config`.
+
 ---
 ## ✅ 4. Verify Configuration
 Run:
