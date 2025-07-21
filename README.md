@@ -34,16 +34,23 @@ This project provides a secure and automated way to **manage isolated AWS enviro
 
 ## ✅ Setup
 
-### **Step 1: Configure AWS CLI**
-Install AWS CLI v2 and configure credentials:
+### **Step 1: Install and Configure AWS CLI**
+Install **AWS CLI v2** and configure credentials:
+For a full installation guide, see [AWS CLI Installation Guide](docs/aws-cli-installation.md).
+
+>AWS CLI v2 comes with its own Python, so you don’t need to install Python separately. (If you’re installing v1, Python is required.)
+
+Run the following to configure your credentials:
+
 ```shell
 aws configure
 ```
-Provide:
-* **AWS Access Key ID**
-* **AWS Secret Access Key**
-* **Default region name** (e.g., `us-east-1`)
-* **Output format** (e.g., `json`)
+You will be prompted to provide:
+
+* **AWS Access Key ID** – Get this from the [IAM Console → Users → Security Credentials](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html).
+* **AWS Secret Access Key** - Generated when you create an Access Key in IAM.  
+* **Default region name** (e.g., `us-east-1`) – Choose a region where your resources are hosted.
+* **Output format** (e.g., `json`) – Recommended default.
 Verify:
 ```shell
 aws sts get-caller-identity
