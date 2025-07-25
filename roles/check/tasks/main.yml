@@ -1,0 +1,39 @@
+---
+- name: Check EC2 instances
+  amazon.aws.ec2_instance_info:
+    filters:
+      "tag:{{ resource_tag_key }}": "{{ resource_tag_value }}"
+  register: env_ec2
+
+- name: Check VPCs
+  amazon.aws.ec2_vpc_net_info:
+    filters:
+      "tag:{{ resource_tag_key }}": "{{ resource_tag_value }}"
+  register: env_vpcs
+
+- name: Check subnets
+  amazon.aws.ec2_vpc_subnet_info:
+    filters:
+      "tag:{{ resource_tag_key }}": "{{ resource_tag_value }}"
+  register: env_subnets
+
+- name: Check security groups
+  amazon.aws.ec2_group_info:
+    filters:
+      "tag:{{ resource_tag_key }}": "{{ resource_tag_value }}"
+  register: env_sgs
+
+- name: Check ELBs
+  amazon.aws.elb_info:
+    filters:
+      "tag:{{ resource_tag_key }}": "{{ resource_tag_value }}"
+  register: env_elbs
+
+- name: Display findings
+  debug:
+    msg:
+      - "EC2 Instances: {{ env_ec2.instances | length }}"
+      - "VPCs: {{ env_vpcs.vpcs | length }}"
+      - "Subnets: {{ env_subnets.subnets | length }}"
+      - "Security Groups: {{ env_sgs.security_groups | length }}"
+      - "ELBs: {{ env_elbs.load_balancers | length }}"

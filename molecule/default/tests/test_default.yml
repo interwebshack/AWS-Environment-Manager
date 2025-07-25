@@ -1,0 +1,7 @@
+---
+- name: Verify IAM roles exist
+  hosts: localhost
+  tasks:
+    - name: Ensure policy names exist
+      debug:
+        msg: "This is a placeholder test. Add real AWS API checks or mocks."

@@ -1,0 +1,16 @@
+---
+- name: Manage AWS Environment IAM and Tagged Resources
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars_files:
+    - ../config/env_config.yml
+
+  vars:
+    mode: "create"   # create | check | destroy
+    nuke: false      # only relevant for destroy
+
+  roles:
+    - { role: create, when: mode == "create" }
+    - { role: check, when: mode == "check" }
+    - { role: destroy, when: mode == "destroy" }

@@ -1,0 +1,108 @@
+---
+- name: Create IAM permission boundary policy
+  amazon.aws.iam_managed_policy:
+    policy_name: "{{ iam_permission_boundary_name }}"
+    policy_document: |
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ec2:*",
+              "vpc:*",
+              "elasticloadbalancing:*",
+              "cloudwatch:*",
+              "logs:*",
+              "autoscaling:*"
+            ],
+            "Resource": "*",
+            "Condition": {
+              "StringEquals": {
+                "aws:RequestTag/{{ resource_tag_key }}": "{{ resource_tag_value }}"
+              }
+            }
+          },
+          {
+            "Effect": "Deny",
+            "Action": "*",
+            "Resource": "*",
+            "Condition": {
+              "StringNotEquals": {
+                "aws:RequestTag/{{ resource_tag_key }}": "{{ resource_tag_value }}"
+              }
+            }
+          }
+        ]
+      }
+    state: present
+
+- name: Create IAM managed policy for environment user
+  amazon.aws.iam_managed_policy:
+    policy_name: "{{ iam_policy_name }}"
+    policy_document: |
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Sid": "AllowTaggedResources",
+            "Effect": "Allow",
+            "Action": [
+              "ec2:*",
+              "vpc:*",
+              "elasticloadbalancing:*",
+              "autoscaling:*",
+              "logs:*",
+              "cloudwatch:*"
+            ],
+            "Resource": "*",
+            "Condition": {
+              "StringEquals": {
+                "aws:ResourceTag/{{ resource_tag_key }}": "{{ resource_tag_value }}"
+              }
+            }
+          },
+          {
+            "Sid": "AllowCreateWithTag",
+            "Effect": "Allow",
+            "Action": [
+              "ec2:RunInstances",
+              "ec2:CreateTags",
+              "ec2:CreateSecurityGroup",
+              "ec2:CreateSubnet",
+              "ec2:CreateVpc"
+            ],
+            "Resource": "*",
+            "Condition": {
+              "StringEquals": {
+                "aws:RequestTag/{{ resource_tag_key }}": "{{ resource_tag_value }}"
+              }
+            }
+          }
+        ]
+      }
+    state: present
+
+- name: Create IAM user with permission boundary
+  amazon.aws.iam_user:
+    name: "{{ iam_user_name }}"
+    state: present
+    permissions_boundary: "arn:aws:iam::{{ lookup('aws_account_attribute', 'account_id') }}:policy/{{ iam_permission_boundary_name }}"
+
+- name: Attach environment policy to IAM user
+  amazon.aws.iam_policy_attachment:
+    policy_arn: "arn:aws:iam::{{ lookup('aws_account_attribute', 'account_id') }}:policy/{{ iam_policy_name }}"
+    users:
+      - "{{ iam_user_name }}"
+
+- name: Create access key for IAM user
+  amazon.aws.iam_access_key:
+    user_name: "{{ iam_user_name }}"
+    state: present
+  register: env_access_keys
+
+- name: Show IAM keys
+  debug:
+    msg:
+      - "Access Key: {{ env_access_keys.access_key.access_key_id }}"
+      - "Secret Key: {{ env_access_keys.access_key.secret_access_key }}"

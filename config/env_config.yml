@@ -1,0 +1,5 @@
+resource_tag_key: "Environment"
+resource_tag_value: "Isolated"
+iam_user_name: "env-user"
+iam_policy_name: "EnvPolicy"
+iam_permission_boundary_name: "EnvPermissionBoundary"

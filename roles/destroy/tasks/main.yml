@@ -1,0 +1,73 @@
+---
+- name: Gather EC2 instances
+  amazon.aws.ec2_instance_info:
+    filters:
+      "tag:{{ resource_tag_key }}": "{{ resource_tag_value }}"
+  register: env_ec2
+
+- name: Terminate EC2 instances if nuke=true
+  amazon.aws.ec2_instance:
+    instance_ids: "{{ item.instance_id }}"
+    state: absent
+  loop: "{{ env_ec2.instances }}"
+  when: nuke | bool
+
+- name: Gather ELBs
+  amazon.aws.elb_info:
+    filters:
+      "tag:{{ resource_tag_key }}": "{{ resource_tag_value }}"
+  register: env_elbs
+
+- name: Delete ELBs if nuke=true
+  amazon.aws.elb:
+    name: "{{ item.name }}"
+    state: absent
+  loop: "{{ env_elbs.load_balancers }}"
+  when: nuke | bool
+
+- name: Gather VPCs
+  amazon.aws.ec2_vpc_net_info:
+    filters:
+      "tag:{{ resource_tag_key }}": "{{ resource_tag_value }}"
+  register: env_vpcs
+
+- name: Delete VPCs if nuke=true
+  amazon.aws.ec2_vpc_net:
+    vpc_id: "{{ item.vpc_id }}"
+    state: absent
+  loop: "{{ env_vpcs.vpcs }}"
+  when: nuke | bool
+  ignore_errors: yes
+
+# IAM cleanup
+- name: Delete IAM access keys
+  amazon.aws.iam_access_key:
+    user_name: "{{ iam_user_name }}"
+    state: absent
+  ignore_errors: yes
+
+- name: Detach IAM policy
+  amazon.aws.iam_policy_attachment:
+    policy_arn: "arn:aws:iam::{{ lookup('aws_account_attribute', 'account_id') }}:policy/{{ iam_policy_name }}"
+    users:
+      - "{{ iam_user_name }}"
+    state: absent
+  ignore_errors: yes
+
+- name: Delete IAM user
+  amazon.aws.iam_user:
+    name: "{{ iam_user_name }}"
+    state: absent
+  ignore_errors: yes
+
+- name: Delete IAM managed policy
+  amazon.aws.iam_managed_policy:
+    policy_name: "{{ iam_policy_name }}"
+    state: absent
+  ignore_errors: yes
+
+- name: Delete permission boundary
+  amazon.aws.iam_managed_policy:
+    policy_name: "{{ iam_permission_boundary_name }}"
+    state: absent
+  ignore_errors: yes

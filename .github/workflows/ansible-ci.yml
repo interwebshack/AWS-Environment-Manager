@@ -15,35 +15,44 @@ jobs:
         ansible-version: [2.14, 2.15, 2.16]
 
     steps:
+      # 1. Checkout the code
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2. Set up Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.x"
 
+      # 3. Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install ansible==${{ matrix.ansible-version }} ansible-lint boto3 botocore yamllint detect-secrets molecule[docker]
           ansible-galaxy collection install amazon.aws
 
+      # 4. Run YAML lint
       - name: YAML Lint
         run: yamllint .
 
-      - name: Ansible Lint
+      # 5. Run ansible-lint
+      - name: Lint Ansible Playbooks
         run: ansible-lint playbooks/
 
+      # 6. Syntax check for main playbook
       - name: Validate Playbook Syntax
         run: ansible-playbook playbooks/manage_environment.yml --syntax-check
 
+      # 7. Run Detect Secrets
       - name: Detect Secrets
         run: detect-secrets scan --all-files
 
+      # 8. Run Molecule Test
       - name: Molecule Test
         run: molecule test
 
+      # 9. Dry run (Check mode) - optional
       - name: Ansible Dry Run (Check Mode)
         if: github.event_name == 'push'
         env:
